@@ -1,0 +1,4 @@
+spiceypy>=4.0.0
+plotly>=5.0
+numpy>=1.20
+kaleido>=0.2
