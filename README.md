@@ -26,3 +26,28 @@ This Python project implements interactive 3D visualizations of:
   - [Jupiter phase](https://nbryant42.github.io/halorbits/juice_jupiter.html)
   - [Ganymede phase](https://nbryant42.github.io/halorbits/juice_ganymede.html)
 * [James Webb Space Telescope](https://nbryant42.github.io/halorbits/jwst_plot.html)
+
+## Local dev notes
+
+SPICE kernels that fit within Github's 100M size limit have been committed.
+Others will have to be downloaded from NASA or ESA.
+
+Steps to use the scripts:
+
+1. Install dependencies (preferably in a virtual environment):
+
+```bash
+pip install -r requirements.txt
+```
+
+2. Run the script (plot will open in browser):
+
+```bash
+python <script>.py
+```
+
+To write static HTML and, for the Lunar Gateway, the PNG preview (requires `kaleido`):
+
+```bash
+python <script>.py --static
+```
