@@ -25,14 +25,19 @@ def sample_object(sc_id, et_start, period, npts):
     defined in `hjb.tk`.
     """
     targ = str(sc_id)
+    # sample epochs
     ets = np.linspace(et_start, et_start + period, npts)
     x, y, z = [], [], []
+    vx, vy, vz = [], [], []
     for et in ets:
         st_sc, _ = sp.spkezr(targ, et, "HJB", "NONE", "SUN")
         r_plot = st_sc[:3]
+        v_plot = st_sc[3:6]
         x.append(r_plot[0]); y.append(r_plot[1]); z.append(r_plot[2])
+        vx.append(v_plot[0]); vy.append(v_plot[1]); vz.append(v_plot[2])
 
-    return (x, y, z)
+    # return positions, epochs, and velocities (all lists)
+    return (x, y, z, ets, vx, vy, vz)
 
 
 def compute_l4_l5_from_jupiter(jx, jy, jz, deg=60.0):
@@ -96,9 +101,9 @@ def main():
     print(f"Sampling mission from {sp.et2utc(et_start,'C',0)} to {sp.et2utc(et_end,'C',0)}")
     print(f"Total samples: {total_pts}")
 
-    (x, y, z) = sample_object(sc_id, et_start, (et_end - et_start), total_pts)
-    (earth_x, earth_y, earth_z) = sample_object("EARTH", et_start, (et_end - et_start), total_pts)
-    (jupiter_x, jupiter_y, jupiter_z) = sample_object("JUPITER_BARYCENTER", et_start, (et_end - et_start), total_pts)
+    x, y, z, ets, vx, vy, vz = sample_object(sc_id, et_start, (et_end - et_start), total_pts)
+    earth_x, earth_y, earth_z, _, _, _, _ = sample_object("EARTH", et_start, (et_end - et_start), total_pts)
+    jupiter_x, jupiter_y, jupiter_z, _, _, _, _ = sample_object("JUPITER_BARYCENTER", et_start, (et_end - et_start), total_pts)
 
     # Mission target bodies (from BSP 'Bodies:' section) to plot
     target_defs = [
@@ -113,7 +118,7 @@ def main():
 
     target_samples = {}
     for label, ident, color in target_defs:
-        tx, ty, tz = sample_object(ident, et_start, (et_end - et_start), total_pts)
+        tx, ty, tz, _, _, _, _ = sample_object(ident, et_start, (et_end - et_start), total_pts)
         target_samples[label] = (tx, ty, tz, color)
 
     # Compute L4/L5 estimated positions from Jupiter barycenter samples
@@ -126,8 +131,27 @@ def main():
     fig.add_trace(go.Scatter3d(x=[0], y=[0], z=[0], mode='markers+text', text=["Sun"],
                                textposition="top center", marker=dict(size=6, color='yellow'), name="Sun"))
 
+    # Prepare customdata for hover: timestamp (UTC string) and velocity magnitude (km/s)
+    # Convert ET epochs to UTC strings for hover display
+    utc_times = [sp.et2utc(et, 'C', 0) for et in ets]
+    # Compute speed in km/s as norm of velocity vector
+    speeds = [np.linalg.norm([vx[i], vy[i], vz[i]]) for i in range(len(vx))]
+
+    # customdata columns: utc string and speed (float).
+    # Use a list of tuples (utc_string, speed) so we keep the string and numeric types separate.
+    customdata = list(zip(utc_times, speeds))
+
+    hovertemplate = (
+        "UTC: %{customdata[0]}<br>"
+        "Speed (in rotating frame, km/s): %{customdata[1]:.3f}<br>"
+        "x: %{x:.7s} km<br>"
+        "y: %{y:.7s} km<br>"
+        "z: %{z:.7s} km<br>"
+        "<extra></extra>"
+    )
+
     fig.add_trace(go.Scatter3d(x=x, y=y, z=z, mode='lines', line=dict(color='magenta', width=4),
-                               name="Genesis probe (GSE)"))
+                               name="Lucy probe (GSE)", customdata=customdata, hovertemplate=hovertemplate))
 
     fig.add_trace(go.Scatter3d(x=earth_x, y=earth_y, z=earth_z, mode='lines', line=dict(color='gray', width=2),
                                name='Earth orbit'))
