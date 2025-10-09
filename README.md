@@ -8,6 +8,7 @@ This Python project implements interactive 3D visualizations of:
 - Planned trajectory of the [Lucy probe](https://en.wikipedia.org/wiki/Lucy_(spacecraft))
 - Planned trajectory of the [JUICE probe](https://en.wikipedia.org/wiki/Jupiter_Icy_Moons_Explorer)
 - As-flown trajectory of the [James Webb Space Telescope](https://en.wikipedia.org/wiki/James_Webb_Space_Telescope)
+- As-flown trajectory of [the Voyagers](https://en.wikipedia.org/wiki/Voyager_program)
 
 3D pan/tilt/zoom is supported via [Plotly](https://plotly.com/python/).
 
@@ -26,6 +27,7 @@ This Python project implements interactive 3D visualizations of:
   - [Jupiter phase](https://nbryant42.github.io/halorbits/juice_jupiter.html)
   - [Ganymede phase](https://nbryant42.github.io/halorbits/juice_ganymede.html)
 * [James Webb Space Telescope](https://nbryant42.github.io/halorbits/jwst_plot.html)
+* [The Voyagers](https://nbryant42.github.io/halorbits/vger.html)
 
 ## Local dev notes
 
